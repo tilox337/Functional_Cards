@@ -1,30 +1,49 @@
 import { useState } from "react";
 import "./App.css";
 
-const createCard = (front = "", back = "") => ({
+const createCard = (front = frontSideText, back = backSideText) => ({
+  id: crypto.randomUUID(),
   frontSide: front,
   backSide: back,
 });
 
 function App() {
-  const [cards, setCards] = useState([createCard("xuy", "zalupa")]);
+  const [cards, setCards] = useState([]);
+  const [frontSideText, setFrontSideText] = useState("");
+  const [backSideText, setBackSideText] = useState("");
   //const [deck, setDeck] = useState({ name: "dasd" });
 
-  const addCard = (front, back) => {
+  const handleAddCard = (front, back) => {
     setCards([...cards, createCard(front, back)]);
   };
 
   return (
     <>
-      {cards.map((card, index) => (
-        <div className="card" key={index}>
+      <div>
+        <input
+          onChange={(e) => {
+            setFrontSideText(e.target.value);
+          }}
+          value={frontSideText}
+        ></input>
+        <input
+          onChange={(e) => {
+            setBackSideText(e.target.value);
+          }}
+          value={backSideText}
+        ></input>
+      </div>
+      {cards.map((card) => (
+        <div className="card" key={card.id}>
           <div>{card.frontSide}</div>
           <div>{card.backSide}</div>
         </div>
       ))}
       <button
         onClick={() => {
-          addCard("xuy", "zalupa");
+          handleAddCard(frontSideText, backSideText);
+          setFrontSideText("");
+          setBackSideText("");
         }}
       >
         kd
@@ -34,3 +53,5 @@ function App() {
 }
 
 export default App;
+
+//пара дней
