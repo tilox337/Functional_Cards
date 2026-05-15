@@ -1,21 +1,15 @@
 import { useState } from "react";
 import "./App.css";
 
-const createCard = (front = frontSideText, back = backSideText) => ({
+const createCard = (front, back) => ({
   id: crypto.randomUUID(),
   frontSide: front,
   backSide: back,
 });
 
-function App() {
-  const [cards, setCards] = useState([]);
+function CardForm({ onAddCard }) {
   const [frontSideText, setFrontSideText] = useState("");
   const [backSideText, setBackSideText] = useState("");
-  //const [deck, setDeck] = useState({ name: "dasd" });
-
-  const handleAddCard = (front, back) => {
-    setCards([...cards, createCard(front, back)]);
-  };
 
   return (
     <>
@@ -33,21 +27,35 @@ function App() {
           value={backSideText}
         ></input>
       </div>
-      {cards.map((card) => (
-        <div className="card" key={card.id}>
-          <div>{card.frontSide}</div>
-          <div>{card.backSide}</div>
-        </div>
-      ))}
       <button
         onClick={() => {
-          handleAddCard(frontSideText, backSideText);
+          onAddCard(frontSideText, backSideText);
           setFrontSideText("");
           setBackSideText("");
         }}
       >
         kd
       </button>
+    </>
+  );
+}
+
+function App() {
+  const [cards, setCards] = useState([]);
+
+  const handleAddCard = (front, back) => {
+    setCards([...cards, createCard(front, back)]);
+  };
+
+  return (
+    <>
+      <CardForm onAddCard={handleAddCard} />
+      {cards.map((card) => (
+        <div className="card" key={card.id}>
+          <div>{card.frontSide}</div>
+          <div>{card.backSide}</div>
+        </div>
+      ))}
     </>
   );
 }
