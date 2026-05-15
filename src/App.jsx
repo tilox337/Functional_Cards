@@ -10,6 +10,7 @@ const createCard = (front, back) => ({
 function CardForm({ onAddCard }) {
   const [frontSideText, setFrontSideText] = useState("");
   const [backSideText, setBackSideText] = useState("");
+  const [errMessage, setErrMessage] = useState("");
 
   return (
     <>
@@ -27,9 +28,19 @@ function CardForm({ onAddCard }) {
           value={backSideText}
         ></input>
       </div>
+      <p>{errMessage}</p>
+      {/*вынести как отдельный компонент */}
       <button
         onClick={() => {
-          onAddCard(frontSideText, backSideText);
+          if (frontSideText.trim() && backSideText.trim()) {
+            onAddCard(frontSideText, backSideText);
+          } else {
+            setTimeout(() => {
+              setErrMessage("");
+            }, 3000);
+            setErrMessage("invalid text");
+          }
+
           setFrontSideText("");
           setBackSideText("");
         }}
