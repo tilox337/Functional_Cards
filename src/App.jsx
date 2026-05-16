@@ -6,6 +6,7 @@ const createCard = (front, back) => ({
   frontSide: front,
   backSide: back,
 });
+const createDeck = (name, cards) => ({ id: crypto.randomUUID() });
 
 function CardForm({ onAddCard }) {
   const [frontSideText, setFrontSideText] = useState("");
@@ -28,24 +29,40 @@ function CardForm({ onAddCard }) {
           value={backSideText}
         ></input>
       </div>
-      <p>{errMessage}</p>
-      {/*вынести как отдельный компонент */}
+      <p style={{ color: "red", fontSize: "12px" }}>{errMessage}</p>
+      {/*вынести err как отдельный компонент*/}
       <button
         onClick={() => {
           if (frontSideText.trim() && backSideText.trim()) {
             onAddCard(frontSideText, backSideText);
+            setFrontSideText("");
+            setBackSideText("");
           } else {
             setTimeout(() => {
               setErrMessage("");
             }, 3000);
             setErrMessage("invalid text");
+            setFrontSideText(frontSideText.trim());
+            setBackSideText(backSideText.trim());
           }
-
-          setFrontSideText("");
-          setBackSideText("");
         }}
       >
         kd
+      </button>
+      <button
+        onClick={() => {
+          fetch("https://opentdb.com/api.php?amount=50")
+            .then((response) => response.json())
+            .then((data) => data.results)
+            .then((results) =>
+              results.map((element) => {
+                //console.log(element.question + " " + element.correct_answer);
+                onAddCard(element.question, element.correct_answer);
+              }),
+            );
+        }}
+      >
+        fetch
       </button>
     </>
   );
@@ -55,7 +72,7 @@ function App() {
   const [cards, setCards] = useState([]);
 
   const handleAddCard = (front, back) => {
-    setCards([...cards, createCard(front, back)]);
+    setCards((prevCards) => [...prevCards, createCard(front, back)]);
   };
 
   return (
@@ -63,8 +80,8 @@ function App() {
       <CardForm onAddCard={handleAddCard} />
       {cards.map((card) => (
         <div className="card" key={card.id}>
-          <div>{card.frontSide}</div>
-          <div>{card.backSide}</div>
+          <div dangerouslySetInnerHTML={{ __html: card.frontSide }} />
+          <div dangerouslySetInnerHTML={{ __html: card.backSide }} />
         </div>
       ))}
     </>
