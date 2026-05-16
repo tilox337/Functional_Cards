@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 const createCard = (front, back) => ({
@@ -6,12 +6,23 @@ const createCard = (front, back) => ({
   frontSide: front,
   backSide: back,
 });
-const createDeck = (name, cards) => ({ id: crypto.randomUUID() });
+const createDeck = (name, cards) => ({ id: crypto.randomUUID(), cards: cards });
 
 function CardForm({ onAddCard }) {
   const [frontSideText, setFrontSideText] = useState("");
   const [backSideText, setBackSideText] = useState("");
   const [errMessage, setErrMessage] = useState("");
+
+  useEffect(() => {
+    fetch("https://opentdb.com/api.php?amount=50")
+      .then((response) => response.json())
+      .then((data) => data.results)
+      .then((results) =>
+        results.map((element) => {
+          onAddCard(element.question, element.correct_answer);
+        }),
+      );
+  }, []);
 
   return (
     <>
@@ -49,27 +60,26 @@ function CardForm({ onAddCard }) {
       >
         kd
       </button>
-      <button
-        onClick={() => {
-          fetch("https://opentdb.com/api.php?amount=50")
-            .then((response) => response.json())
-            .then((data) => data.results)
-            .then((results) =>
-              results.map((element) => {
-                //console.log(element.question + " " + element.correct_answer);
-                onAddCard(element.question, element.correct_answer);
-              }),
-            );
-        }}
-      >
-        fetch
-      </button>
     </>
   );
 }
 
 function App() {
   const [cards, setCards] = useState([]);
+  const [decks, setDecks] = useState([]);
+  const [deckNum, setDeckNum] = useState(0);
+  const handleAddCard_ = (deckNum, front, back) => {
+    setDecks((prevDecks) =>
+      prevDecks.map((deck, index) => {
+        if (index !== deckNum) return deck;
+        else
+          return {
+            ...deck,
+            cards: [...deck.cards, createCard(front, back)],
+          };
+      }),
+    );
+  };
 
   const handleAddCard = (front, back) => {
     setCards((prevCards) => [...prevCards, createCard(front, back)]);
@@ -80,8 +90,14 @@ function App() {
       <CardForm onAddCard={handleAddCard} />
       {cards.map((card) => (
         <div className="card" key={card.id}>
-          <div dangerouslySetInnerHTML={{ __html: card.frontSide }} />
-          <div dangerouslySetInnerHTML={{ __html: card.backSide }} />
+          <div
+            style={{ width: "50%" }}
+            dangerouslySetInnerHTML={{ __html: card.frontSide }}
+          />
+          <div
+            style={{ width: "50%" }}
+            dangerouslySetInnerHTML={{ __html: card.backSide }}
+          />
         </div>
       ))}
     </>
