@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import DeckForm from "./DeckFormDec";
+import DeckForm from "./DeckForm";
 import CardForm from "./CardForm";
 
 const createCard = (front, back) => ({
@@ -14,11 +14,6 @@ const createDeck = (name, cards) => ({
   name: name,
   cards: cards,
 });
-
-const ErrorMessage = ({ text }) => {
-  if (!text) return null;
-  return <p style={{ color: "red", fontSize: "12px" }}>{text}</p>;
-};
 
 const App = () => {
   const [decks, setDecks] = useState(() => [
@@ -50,6 +45,20 @@ const App = () => {
     );
   };
 
+  const handleDeleteCard = () => {};
+  const handleDeleteDeck = () => {
+    if (decks.length <= 1) {
+      alert("Нельзя удалить последнюю колоду!");
+      return;
+    }
+
+    setDecks((prevDecks) =>
+      prevDecks.filter((deck, index) => index !== activeDeckNum),
+    );
+
+    setDeckNum(0);
+  };
+
   return (
     <>
       <button
@@ -75,6 +84,7 @@ const App = () => {
             }),
           );
         }}
+        onDeleteDeck={handleDeleteDeck}
       />
 
       <CardForm

@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 
+const createCard = (front, back) => ({
+  id: crypto.randomUUID(),
+  frontSide: front,
+  backSide: back,
+});
+
+const ErrorMessage = ({ text }) => {
+  if (!text) return null;
+  return <p style={{ color: "red", fontSize: "12px" }}>{text}</p>;
+};
+
 const CardForm = ({ onAddSingleCard, onAddManyCards }) => {
   const [frontSideText, setFrontSideText] = useState("");
   const [backSideText, setBackSideText] = useState("");
@@ -54,3 +65,5 @@ const CardForm = ({ onAddSingleCard, onAddManyCards }) => {
     </>
   );
 };
+
+export default CardForm;
