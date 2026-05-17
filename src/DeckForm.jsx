@@ -13,12 +13,15 @@ const DeckForm = ({
         return (
           <div key={deck.id}>
             {index === activeDeckNum ? (
-              <input
-                value={deck.name}
-                onChange={(e) => {
-                  onChangeName(e.target.value);
-                }}
-              />
+              <>
+                <input
+                  value={deck.name}
+                  onChange={(e) => {
+                    onChangeName(e.target.value);
+                  }}
+                />
+                <button onClick={onDeleteDeck}>X</button>
+              </>
             ) : (
               <button
                 onClick={() => {
@@ -28,7 +31,6 @@ const DeckForm = ({
                 {deck.name}
               </button>
             )}
-            <button onClick={onDeleteDeck}>X</button>
           </div>
         );
       })}

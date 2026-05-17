@@ -45,13 +45,8 @@ const App = () => {
     );
   };
 
-  const handleDeleteCard = () => {};
-  const handleDeleteDeck = () => {
-    if (decks.length <= 1) {
-      alert("Нельзя удалить последнюю колоду!");
-      return;
-    }
-
+  const handleDeleteCard = (deckId, deleteCardId) => {};
+  const handleDeleteDeck = (deckToDeleteId) => {
     setDecks((prevDecks) =>
       prevDecks.filter((deck, index) => index !== activeDeckNum),
     );
@@ -92,18 +87,23 @@ const App = () => {
         onAddManyCards={handleAddCards}
       />
 
-      {decks[activeDeckNum]?.cards.map((card) => (
-        <div className="card" key={card.id}>
-          <div
-            style={{ width: "50%" }}
-            dangerouslySetInnerHTML={{ __html: card.frontSide }}
-          />
-          <div
-            style={{ width: "50%" }}
-            dangerouslySetInnerHTML={{ __html: card.backSide }}
-          />
-        </div>
-      ))}
+      {decks[activeDeckNum] ? (
+        decks[activeDeckNum]?.cards.map((card) => (
+          <div className="card" key={card.id}>
+            <div
+              style={{ width: "45%" }}
+              dangerouslySetInnerHTML={{ __html: card.frontSide }}
+            />
+            <div
+              style={{ width: "45%" }}
+              dangerouslySetInnerHTML={{ __html: card.backSide }}
+            />
+            <button onClick={() => handleDeleteCard(card.id)}>X</button>
+          </div>
+        ))
+      ) : (
+        <></>
+      )}
     </>
   );
 };
