@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const DeckForm = ({ decks, activeDeckNum, onChangeDeck }) => {
+const DeckForm = ({ decks, activeDeckNum, onChangeDeck, onChangeName }) => {
   return (
     <>
       {decks.map((deck, index) => {
         if (index === activeDeckNum)
-          return <input key={deck.id} defaultValue={deck.name}></input>;
+          return (
+            <input
+              key={deck.id}
+              value={deck.name}
+              onChange={(e) => {
+                onChangeName(e.target.value);
+              }}
+            ></input>
+          );
         else
           return (
             <button
@@ -139,6 +147,17 @@ function App() {
         decks={decks}
         activeDeckNum={activeDeckNum}
         onChangeDeck={setDeckNum}
+        onChangeName={(name) => {
+          setDecks((prevDecks) =>
+            prevDecks.map((deck, index) => {
+              if (index !== activeDeckNum) return deck;
+              return {
+                ...deck,
+                name: name,
+              };
+            }),
+          );
+        }}
       />
 
       <CardForm
