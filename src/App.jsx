@@ -16,8 +16,11 @@ const createDeck = (name, cards) => ({
 });
 
 const App = () => {
-  const [decks, setDecks] = useState(() => [createDeck("asd", [])]);
+  const [decks, setDecks] = useState(() => [createDeck("Default", [])]);
   const [activeDeckNum, setDeckNum] = useState(0);
+  const [cardToChange, setCardTochange] = useState(-1);
+
+  const handleSave = () => {};
 
   const handleAddCard = (front, back, deckNum = activeDeckNum) => {
     setDecks((prevDecks) =>
@@ -96,17 +99,75 @@ const App = () => {
       />
 
       {decks[activeDeckNum] ? (
-        decks[activeDeckNum]?.cards.map((card) => (
+        decks[activeDeckNum]?.cards.map((card, index) => (
           <div className="card" key={card.id}>
-            <div
-              style={{ width: "45%" }}
-              dangerouslySetInnerHTML={{ __html: card.frontSide }}
-            />
-            <div
-              style={{ width: "45%" }}
-              dangerouslySetInnerHTML={{ __html: card.backSide }}
-            />
-            <button onClick={() => handleDeleteCard(card.id)}>X</button>
+            {cardToChange !== index ? (
+              <>
+                <div
+                  style={{ width: "45%" }}
+                  dangerouslySetInnerHTML={{ __html: card.frontSide }}
+                />
+                <div
+                  style={{ width: "45%" }}
+                  dangerouslySetInnerHTML={{ __html: card.backSide }}
+                />
+                <button
+                  onClick={() => {
+                    setCardTochange(index);
+                  }}
+                >
+                  Change
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  value={card.frontSide}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setDecks((prevDecks) =>
+                      prevDecks.map((deck, index) => {
+                        if (index !== activeDeckNum) return deck;
+                        return {
+                          ...deck,
+                          cards: deck.cards.map((c) =>
+                            c.id === card.id
+                              ? { ...c, frontSide: newValue }
+                              : c,
+                          ),
+                        };
+                      }),
+                    );
+                  }}
+                />
+                <input
+                  value={card.backSide}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setDecks((prevDecks) =>
+                      prevDecks.map((deck, index) => {
+                        if (index !== activeDeckNum) return deck;
+                        return {
+                          ...deck,
+                          cards: deck.cards.map((c) =>
+                            c.id === card.id ? { ...c, backSide: newValue } : c,
+                          ),
+                        };
+                      }),
+                    );
+                  }}
+                />
+              </>
+            )}
+
+            <button
+              onClick={() => {
+                handleDeleteCard(card.id);
+                setCardTochange(-1);
+              }}
+            >
+              X
+            </button>
           </div>
         ))
       ) : (
