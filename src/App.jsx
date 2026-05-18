@@ -3,10 +3,11 @@ import "./App.css";
 import DeckForm from "./DeckForm";
 import CardForm from "./CardForm";
 
-const createCard = (front, back) => ({
+const createCard = (front, back, learned = false) => ({
   id: crypto.randomUUID(),
   frontSide: front,
   backSide: back,
+  learned: learned,
 });
 
 const createDeck = (name, cards) => ({
@@ -16,11 +17,25 @@ const createDeck = (name, cards) => ({
 });
 
 const App = () => {
-  const [decks, setDecks] = useState(() => [createDeck("Default", [])]);
+  const [decks, setDecks] = useState(() => {
+    const saved = localStorage.getItem("decks");
+    return [createDeck("default", []), ...(saved ? JSON.parse(saved) : [])];
+  });
+  const [defId, setDefId] = useState(null);
   const [activeDeckNum, setDeckNum] = useState(0);
   const [cardToChange, setCardTochange] = useState(-1);
 
-  const handleSave = () => {};
+  useEffect(() => {
+    setDefId(decks[0].id);
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem(
+      "decks",
+      JSON.stringify(decks.filter((deck) => deck.id !== defId)),
+    );
+  };
+  useEffect(handleSave, [decks]);
 
   const handleAddCard = (front, back, deckNum = activeDeckNum) => {
     setDecks((prevDecks) =>
@@ -92,11 +107,12 @@ const App = () => {
         }}
         onDeleteDeck={handleDeleteDeck}
       />
-
-      <CardForm
-        onAddSingleCard={handleAddCard}
-        onAddManyCards={handleAddCards}
-      />
+      {decks[activeDeckNum]?.id !== defId && decks[activeDeckNum] ? (
+        <CardForm
+          onAddSingleCard={handleAddCard}
+          onAddManyCards={handleAddCards}
+        />
+      ) : null}
 
       {decks[activeDeckNum] ? (
         decks[activeDeckNum]?.cards.map((card, index) => (
@@ -111,6 +127,27 @@ const App = () => {
                   style={{ width: "45%" }}
                   dangerouslySetInnerHTML={{ __html: card.backSide }}
                 />
+                <input
+                  type="checkbox"
+                  checked={card.learned || false}
+                  onChange={() => {
+                    setDecks((prevDecks) =>
+                      prevDecks.map((deck, dIdx) => {
+                        if (dIdx !== activeDeckNum) return deck;
+
+                        return {
+                          ...deck,
+                          cards: deck.cards.map((c) =>
+                            c.id === card.id
+                              ? { ...c, learned: !c.learned }
+                              : c,
+                          ),
+                        };
+                      }),
+                    );
+                  }}
+                />
+
                 <button
                   onClick={() => {
                     setCardTochange(index);
@@ -157,6 +194,7 @@ const App = () => {
                     );
                   }}
                 />
+                <button onClick={() => setCardTochange(-1)}>apply</button>
               </>
             )}
 
