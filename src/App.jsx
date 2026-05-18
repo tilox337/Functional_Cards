@@ -16,9 +16,7 @@ const createDeck = (name, cards) => ({
 });
 
 const App = () => {
-  const [decks, setDecks] = useState(() => [
-    createDeck("asd", [createCard("asd", "qwe")]),
-  ]);
+  const [decks, setDecks] = useState(() => [createDeck("asd", [])]);
   const [activeDeckNum, setDeckNum] = useState(0);
 
   const handleAddCard = (front, back, deckNum = activeDeckNum) => {
@@ -45,7 +43,17 @@ const App = () => {
     );
   };
 
-  const handleDeleteCard = (deckId, deleteCardId) => {};
+  const handleDeleteCard = (deleteCardId) => {
+    setDecks((prevDecks) =>
+      prevDecks.map((deck, index) => {
+        if (index !== activeDeckNum) return deck;
+        return {
+          ...deck,
+          cards: deck.cards.filter((card) => card.id !== deleteCardId),
+        };
+      }),
+    );
+  };
   const handleDeleteDeck = (deckToDeleteId) => {
     setDecks((prevDecks) =>
       prevDecks.filter((deck, index) => index !== activeDeckNum),
